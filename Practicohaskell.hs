@@ -84,5 +84,8 @@ juegosGanadores2 i = [x|x<-[2..i],mod x 7 == 0 || mod x 7 ==2]
 juegosGanadores1 :: Int -> [Int]
 juegosGanadores1 i = [k|k<-[2..i],evalEstado(H,k)==CGano]
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> 2732827a7966710fa11cc440dba4eaa2c2515d70
