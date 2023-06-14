@@ -1,0 +1,97 @@
+Casos de Prueba Trabajo Practico Programación Avanzada
+Funciones realizadas:
+
+-otroJugador: 
+
+otroJugador :: Jugador -> Jugador
+otroJugador C = H
+otroJugador H = C
+
+Esta función nos sirve para cambiar de jugador luego de que uno de los dos realizo la jugada.
+	
+	Función otroJugador:
+	ghci> otroJugador H
+	C
+	ghci> otroJugador C
+	H
+
+-hacerJugada: 
+
+hacerJugada :: Int -> Estado -> Estado
+hacerJugada n (j,k)
+                  |elem n jugadas && k-n>=0 = (otroJugador j,k-n)
+                  |otherwise = error "jugada no valida"
+
+Esta función es la encargada de realizar el movimiento de retirar la cantidad de piedras al oponente, pasada en los parámetros y comprueba si es valida esa jugada teniendo en cuenta un caso no valido.
+
+	ghci> hacerJugada 3 (C,7)
+	(H,4)
+	ghci> hacerJugada 6 (C,7)
+	* Exception: jugada no valida
+	ghci> hacerJugada 1 (H,8)
+	(C,7)
+	ghci> hacerJugada 6 (H,7)
+	* Exception: jugada no valida
+
+-mejorJug:
+
+mejorJug :: Estado -> Int
+mejorJug (j,k) 
+            |j==C = foldl max 1 [x|x<-jugadas, k-x>=0 && evalEstado(H , k-x) == CGano]
+            |j==H = foldl max 1 [x|x<-jugadas, k-x>=0 && evalEstado(C , k-x) == CPerdio]
+
+Esta función es la que nos calcula cual es el mejor movimiento que podemos realizar con una estado dado en los parámetros. Separando en casos dependiendo del jugador calculamos una lista en la cual van a estar las jugadas (1,3,4) validas, las cuales al entrar a evalEstado nos de como resultado CGano en el caso de la computadora y CPerdio en el caso del jugador, luego a esta lista se le toma la jugada mas grande que se pueda realizar, en el caso que no se pueda realizar ninguna jugada que cumpla la condición se toma como mejor jugada el 1. Como testeo simulamos un caso de juego.
+	ghci> mejorJug (H,9)
+	1
+	ghci> mejorJug(C,8)
+	1
+	ghci> mejorJug (H,7)
+	1
+	ghci> mejorJug(C,6)
+	4
+	ghci> mejorJug(H,2)
+	1
+	ghci> mejorJug (C,1)
+	1
+Como resultado el juego queda (H,0) por lo tanto en este caso C es ganador
+
+-juegosGanadores:
+
+juegosGanadores2 :: Int -> [Int]
+juegosGanadores2 i = [x|x<-[2..i],mod x 7 == 0 || mod x 7 ==2]
+
+juegosGanadores1 :: Int -> [Int]
+juegosGanadores1 i = [k|k<-[2..i],evalEstado(H,k)==CGano]
+
+En esta función realizamos dos formas de hacerla, juegosGanadores1 y juegosGanadores2, ya que juegosGanadores1 era muy ineficiente, realizamos una optimización de ella analizando el resultado que nos iba dejando, encontramos un patrón y logramos desarrollar una función eficiente a la que le llamamos juegosGanadores2. La función juegosGanadores1 va proando todos los numeros desde el 2 hasta el numero i dado, agregando a la lista solo los elementos i en los que evalEstado con el humano y la cantidad i de piedras que nos devuelva que CGano, es decir en estos casos la computadora siempre va ser la ganadora.
+
+juegosGanadores1 100
+[2,7,9,14,16,21,23,28,30,35,37,42,.......
+Corroboramos que la función juegosGanadores2 realiza el mismo patrón que juegosGanadores1, pero dejando a juegosGanadores1 una hora en ejecución la función nos devolvió 42 que era el resultado esperado pero no sabríamos si habría un caso en el que no fuera verdadero.
+
+juegosGanadores2 100
+[2,7,9,14,16,21,23,28,30,35,37,42,44,49,51,56,58,63,65,70,72,77,79,84,86,91,93,98,100]
+
+-Testeo Realizado con 7 piedras
+
+Testeamos con 7 piedras:
+	ghci> comenzarJuego 7
+	Hay 7 piedras, cuantas saca?:
+	1
+	mi jugada: 4
+	Hay 2 piedras, cuantas saca?:
+	1
+	mi jugada: 1
+	Perdio!
+
+	ghci> comenzarJuego 7
+	Hay 7 piedras, cuantas saca?:
+	3
+	mi jugada: 4
+	Perdio!
+
+	ghci> comenzarJuego 7 
+	Hay 7 piedras, cuantas saca?:
+	4
+	mi jugada: 3
+	Perdio!
